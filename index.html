@@ -42,6 +42,9 @@
     inset: 0;
     z-index: 20;
     background: #000;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
   #screen-game.active { display: block; }
 
@@ -99,10 +102,13 @@
     padding: 16px 0;
     cursor: pointer;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     transition: background 0.15s;
   }
-  .btn-change-breed.pressing {
+  .btn-change-breed.changed {
     background: rgba(60,60,60,0.9);
   }
 
@@ -413,7 +419,7 @@
 
 </style>
 </head>
-<body>
+<body oncontextmenu="return false">
 
 <div id="screen-game">
   <button class="btn-back-title" onclick="goTitle()">&#8592;</button>
@@ -655,27 +661,36 @@ function startGame() {
 }
 
 function goTitle() {
-  document.getElementById('dogFrame').classList.remove('changed');
+  isChanged = false;
+  dogFrame.classList.remove('changed');
+  btnChange.classList.remove('changed');
+  btnChange.textContent = '🔀 犬種チェンジ！';
+  stopEffects();
   document.getElementById('screen-game').classList.remove('active');
 }
 
 const btnChange = document.getElementById('btnChange');
 const dogFrame  = document.getElementById('dogFrame');
 
-function pressChange() {
-  btnChange.classList.add('pressing');
+function pressChange(e) {
+  e.preventDefault();
+  btnChange.classList.add('changed');
   dogFrame.classList.add('changed');
+  startEffects();
 }
 function releaseChange() {
-  btnChange.classList.remove('pressing');
+  btnChange.classList.remove('changed');
   dogFrame.classList.remove('changed');
+  stopEffects();
 }
 
 btnChange.addEventListener('mousedown',  pressChange);
-btnChange.addEventListener('touchstart', pressChange, {passive:true});
+btnChange.addEventListener('touchstart', pressChange, {passive:false});
 btnChange.addEventListener('mouseup',    releaseChange);
 btnChange.addEventListener('mouseleave', releaseChange);
 btnChange.addEventListener('touchend',   releaseChange);
+btnChange.addEventListener('touchcancel',releaseChange);
+btnChange.addEventListener('contextmenu', e => e.preventDefault());
 
 
 // ===== パチンコ演出エフェクト =====
